@@ -12,6 +12,7 @@ class image:
         self.width=self.img.shape[1]
         self.height=self.img.shape[0]
         self.colours=self.img.shape[2]
+
     def dataPrint(self):
         print ("Data path: "+ self.link)
         print ("image width: "+ str(self.width) + " height: " + str(self.height))
@@ -22,11 +23,18 @@ class image:
                 print (str(i+1) + ":" +self.Operations[i])
         else:
             print ("No operations")
+
     def showOrgImg(self):
         cv2.imshow("orignial image", self.org_img)
         cv2.waitKey(0)
+
     def showImg(self):
         cv2.imshow("Image", self.img)
         cv2.waitKey(0)
-    def intergrate(self):
-        self.Operations.append("intergrate")
+
+    def grayScale(self):
+        self.img = cv2.cvtColor(self.img, cv2.COLOR_RGB2GRAY)
+        self.Operations.append("grayScale")
+    def adaptiveThreshold:
+        th2 = cv.adaptiveThreshold(img,255,cv.ADAPTIVE_THRESH_MEAN_C,\
+            cv.THRESH_BINARY,11,2)
