@@ -5,6 +5,7 @@ import numpy as np
 
 class image:
     Operations=[]
+    ones_kernel = np.ones((2,2),np.uint8)
     def __init__(self, link):
         self.link=link
         self.org_img=cv2.imread(link)
@@ -35,6 +36,11 @@ class image:
     def grayScale(self):
         self.img = cv2.cvtColor(self.img, cv2.COLOR_RGB2GRAY)
         self.Operations.append("grayScale")
-    def adaptiveThreshold:
-        th2 = cv.adaptiveThreshold(img,255,cv.ADAPTIVE_THRESH_MEAN_C,\
-            cv.THRESH_BINARY,11,2)
+    def adaptiveThreshold(self):
+        self.img = cv2.adaptiveThreshold(self.img,255,cv2.ADAPTIVE_THRESH_MEAN_C,\
+            cv2.THRESH_BINARY,11,2)
+        self.Operations.append("adaptiveThreshold")
+    def median(self, n):
+        self.img=cv2.medianBlur(self.img,n)
+    def erode(self, n):
+        self.img=cv2.erode(self.img,self.ones_kernel,iterations = n)
