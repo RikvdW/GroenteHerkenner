@@ -42,5 +42,19 @@ class image:
         self.Operations.append("adaptiveThreshold")
     def median(self, n):
         self.img=cv2.medianBlur(self.img,n)
+        self.Operations.append("Median")
     def erode(self, n):
         self.img=cv2.erode(self.img,self.ones_kernel,iterations = n)
+        self.Operations.append("Erode")
+    def dilate(self, n):
+        self.img=cv2.dilate(self.img,self.ones_kernel,iterations = n)
+        self.Operations.append("Dilate")
+    def fill(self):
+        h, w = self.img.shape[:2]
+        mask = np.zeros((h+2, w+2), np.uint8)
+        # Floodfill from point (0, 0)
+        cv2.floodFill(self.img, mask, (0,0), 255);
+
+        # Invt floodfilled image
+        self.img = cv2.bitwise_not(self.img)
+        # Combine the two images to get the for
