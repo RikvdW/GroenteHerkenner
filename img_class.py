@@ -100,23 +100,9 @@ class image:
 
         mask=cv2.erode(mask,self.ones_kernel,iterations = 3)
         mask=cv2.dilate(mask,self.ones_kernel,iterations = 3)
-        size = np.size(mask)
-        element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-        done = False
-        skel = np.zeros(mask.shape,np.uint8)
-        while( not done):
-            eroded = cv2.erode(mask,element)
-            temp = cv2.dilate(eroded,element)
-            temp = cv2.subtract(mask,temp)
-            skel = cv2.bitwise_or(skel,temp)
-            mask = eroded.copy()
-
-            zeros = size - cv2.countNonZero(mask)
-            if zeros==size:
-                done = True
 
         self.mask=mask
-        self.img = skel
+        self.img = mask
         #self.img = cv2.bitwise_and(self.img,self.img, mask= mask)
     def getHSvalue(self):
         img_h=self.img[:,:,0]
