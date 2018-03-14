@@ -15,7 +15,7 @@ class image:
         self.width=self.img.shape[1]
         self.height=self.img.shape[0]
         self.colours=self.img.shape[2]
-
+        self.data=[]
     def dataPrint(self):
         print ("Data path: "+ self.link)
         print ("image width: "+ str(self.width) + " height: " + str(self.height))
@@ -36,7 +36,13 @@ class image:
         plt.plot(self.Harray,'g')
 
         plt.show()
-
+    def makeData(self):
+        self.data=self.Hlinearray+self.Hlinearray+self.Harray
+        #self.data.append(self.Hlinearray)
+        #self.data.append(self.Slinearray)
+        #self.data.append(self.Harray)
+        self.data.append(int(self.TextBusy))
+        print (self.data)
     def showOrgImg(self):
         cv2.imshow("orignial image", self.org_img)
         cv2.waitKey(0)
@@ -102,11 +108,11 @@ class image:
         mask=cv2.dilate(mask,self.ones_kernel,iterations = 3)
 
         self.mask=mask
-        self.img = mask
-        #self.img = cv2.bitwise_and(self.img,self.img, mask= mask)
+        #self.img = mask
+        self.img = cv2.bitwise_and(self.img,self.img, mask= mask)
     def getHSvalue(self):
-        img_h=self.img[:,:,0]
-        img_s=self.img[:,:,1]
+        #img_h=self.img[:,:,0]
+        #img_s=self.img[:,:,1]
         self.hist_s = cv2.calcHist([self.img[:,:,0]],[0],None,[256],[1,256])
         self.hist_h = cv2.calcHist([self.img[:,:,1]],[0],None,[256],[1,256])
 
@@ -114,7 +120,7 @@ class image:
         self.Harray=[0,0,0,0,0,0]
         for i in range(0,5):
             for j in range(1,int(len(self.hist_h)/5)):
-                self.Harray[i]+=self.hist_h[j*(1+i)]
+                self.Harray[i]+=int(self.hist_h[j*(1+i)])
 
     def getLineHSvalue(self, n):
         img_h=self.img[n,:,0]
