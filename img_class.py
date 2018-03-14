@@ -108,7 +108,11 @@ class image:
         mask=cv2.dilate(mask,self.ones_kernel,iterations = 3)
 
         self.mask=mask
+<<<<<<< HEAD
         #self.img = mask
+=======
+        #self.img = skel
+>>>>>>> origin/master
         self.img = cv2.bitwise_and(self.img,self.img, mask= mask)
     def getHSvalue(self):
         #img_h=self.img[:,:,0]
