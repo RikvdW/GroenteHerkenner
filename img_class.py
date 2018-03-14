@@ -8,6 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 class image:
     Operations=[]
     ones_kernel = np.ones((4,4),np.uint8)
+    kernel = np.ones((50,50),np.uint8)
     def __init__(self, link):
         self.link=link
         self.org_img=cv2.imread(link)
@@ -106,13 +107,10 @@ class image:
 
         mask=cv2.erode(mask,self.ones_kernel,iterations = 3)
         mask=cv2.dilate(mask,self.ones_kernel,iterations = 3)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel)
 
         self.mask=mask
-<<<<<<< HEAD
-        #self.img = mask
-=======
-        #self.img = skel
->>>>>>> origin/master
+        #self.img=mask
         self.img = cv2.bitwise_and(self.img,self.img, mask= mask)
     def getHSvalue(self):
         #img_h=self.img[:,:,0]
@@ -147,3 +145,39 @@ class image:
         self.TextBusy = 0
         for i in range(1,len(canyHist)):
             self.TextBusy+=canyHist[i]
+    def findCont(self):
+        im2, contours, hierarchy = cv2.findContours(self.mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        self.rect = cv2.minAreaRect(contours[0])
+        box = cv2.boxPoints(self.rect)
+        self.box = np.int0(box)
+        #cv.drawContours(img,[box],0,(0,0,255),2)
+        cv2.drawContours(self.img, [self.box], -1, (0,255,0), 3)
+        print (box)
+    def subimage(self):
+
+        W = self.rect[1][0]
+        H = self.rect[1][1]
+
+        Xs = [i[0] for i in self.box]
+        Ys = [i[1] for i in self.box]
+        x1 = min(Xs)
+        x2 = max(Xs)
+        y1 = min(Ys)
+        y2 = max(Ys)
+
+        angle = self.rect[2]
+        if angle < -45:
+            angle += 90
+
+        # Center of rectangle in source image
+        center = ((x1+x2)/2,(y1+y2)/2)
+        # Size of the upright rectangle bounding the rotated rectangle
+        size = (x2-x1, y2-y1)
+        M = cv2.getRotationMatrix2D((size[0]/2, size[1]/2), angle, 1.0)
+        # Cropped upright rectangle
+        cropped = cv2.getRectSubPix(self.img, size, center)
+        cropped = cv2.warpAffine(cropped, M, size)
+        croppedW = H if H > W else W
+        croppedH = H if H < W else W
+        # Final cropped & rotated rectangle
+        self.img = cv2.getRectSubPix(cropped, (int(croppedW),int(croppedH)), (size[0]/2, size[1]/2))
