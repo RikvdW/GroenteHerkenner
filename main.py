@@ -7,15 +7,17 @@ import cv2
 
 
 
-img = image("fotos/prei.jpeg")
+img = image("fotos/broccoli2.jpeg")
 img.resize()
 img.BGR2RGB()
 img.gauss()
 img.RGB2HSV()
 img.filter()
+img.findCont()
+img.subimage()
 img.getHSvalue()
 img.QuantiseHvalue()
-img.getLineHSvalue(150)
+img.getLineHSvalue()
 img.Texture()
 img.HSV2BGR()
 img.makeData()
@@ -26,6 +28,5 @@ img.QuantiseHvalue()
 #img.HSV2BGR()
 #img.dataPrint()
 #FO.helloworld(img.mask)
-img.findCont()
-img.subimage()
+
 img.showImg()

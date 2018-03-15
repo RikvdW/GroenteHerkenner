@@ -124,7 +124,8 @@ class image:
             for j in range(1,int(len(self.hist_h)/5)):
                 self.Harray[i]+=int(self.hist_h[j*(1+i)])
 
-    def getLineHSvalue(self, n):
+    def getLineHSvalue(self):
+        n = int(self.img.shape[0]/2)
         img_h=self.img[n,:,0]
         img_s=self.img[n,:,1]
         self.Hlinearray=[0,0,0,0,0,0]
@@ -146,13 +147,23 @@ class image:
         for i in range(1,len(canyHist)):
             self.TextBusy+=canyHist[i]
     def findCont(self):
-        im2, contours, hierarchy = cv2.findContours(self.mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        _ ,contours,_ = cv2.findContours(self.mask,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE)
         self.rect = cv2.minAreaRect(contours[0])
         box = cv2.boxPoints(self.rect)
         self.box = np.int0(box)
         #cv.drawContours(img,[box],0,(0,0,255),2)
+        rows,cols = self.img.shape[:2]
+        [vx,vy,x,y] = cv2.fitLine(contours[0], cv2.DIST_L2,0,0.01,0.01)
+        print (np.int0([vx,vy,x,y]))
+        self.x=x
+        self.y=y
+        lefty = int((-x*vy/vx) + y)
+        righty = int(((cols-x)*vy/vx)+y)
+        print (lefty)
+        print (righty)
+        cv2.line(self.img,(cols-1,righty),(0,lefty),(0,255,0),2)
+
         cv2.drawContours(self.img, [self.box], -1, (0,255,0), 3)
-        print (box)
     def subimage(self):
 
         W = self.rect[1][0]
@@ -166,9 +177,10 @@ class image:
         y2 = max(Ys)
 
         angle = self.rect[2]
-        if angle < -45:
-            angle += 90
-
+        #(np.cos(self.y/self.x)/np.pi*180)
+        print((np.cos(self.y/self.x)/np.pi*180) )
+        #if angle < -45:
+        #    angle += 90
         # Center of rectangle in source image
         center = ((x1+x2)/2,(y1+y2)/2)
         # Size of the upright rectangle bounding the rotated rectangle
