@@ -7,7 +7,7 @@ import cv2
 
 
 
-img = image("fotos/broccoli2.jpeg")
+img = image("fotos/auburgine1.jpeg")
 img.resize()
 img.BGR2RGB()
 img.gauss()

@@ -148,21 +148,27 @@ class image:
             self.TextBusy+=canyHist[i]
     def findCont(self):
         _ ,contours,_ = cv2.findContours(self.mask,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE)
-        self.rect = cv2.minAreaRect(contours[0])
+        # Find the index of the largest contour
+        areas = [cv2.contourArea(c) for c in contours]
+        max_index = np.argmax(areas)
+        cnt=contours[max_index]
+        self.rect = cv2.minAreaRect(cnt)
         box = cv2.boxPoints(self.rect)
         self.box = np.int0(box)
         #cv.drawContours(img,[box],0,(0,0,255),2)
         rows,cols = self.img.shape[:2]
-        [vx,vy,x,y] = cv2.fitLine(contours[0], cv2.DIST_L2,0,0.01,0.01)
-        print (np.int0([vx,vy,x,y]))
+        [vx,vy,x,y] = cv2.fitLine(cnt, cv2.DIST_L2,0,0.01,0.01)
+        print ([vx,vy,x,y])
+        self.vx=vx
+        self.vy=vy
         self.x=x
         self.y=y
         lefty = int((-x*vy/vx) + y)
         righty = int(((cols-x)*vy/vx)+y)
-        print (lefty)
-        print (righty)
+        print ("lefty"+str(lefty))
+        print ("righty"+str(righty))
         cv2.line(self.img,(cols-1,righty),(0,lefty),(0,255,0),2)
-
+        self.cols=cols
         cv2.drawContours(self.img, [self.box], -1, (0,255,0), 3)
     def subimage(self):
 
@@ -176,13 +182,15 @@ class image:
         y1 = min(Ys)
         y2 = max(Ys)
 
-        angle = self.rect[2]
+        angle = self.vy/self.vx*160/np.pi#self.rect[2]
+        print (self.rect[2])
         #(np.cos(self.y/self.x)/np.pi*180)
-        print((np.cos(self.y/self.x)/np.pi*180) )
-        #if angle < -45:
-        #    angle += 90
+        print ("cool")
+        print(self.vy/self.vx)
+        if angle < -45:
+            angle += 90
         # Center of rectangle in source image
-        center = ((x1+x2)/2,(y1+y2)/2)
+        center = (self.x,self.y)
         # Size of the upright rectangle bounding the rotated rectangle
         size = (x2-x1, y2-y1)
         M = cv2.getRotationMatrix2D((size[0]/2, size[1]/2), angle, 1.0)
