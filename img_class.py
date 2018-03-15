@@ -8,6 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 class image:
     Operations=[]
     ones_kernel = np.ones((4,4),np.uint8)
+    kernel = np.ones((50,50),np.uint8)
     def __init__(self, link):
         self.link=link
         self.org_img=cv2.imread(link)
@@ -15,7 +16,7 @@ class image:
         self.width=self.img.shape[1]
         self.height=self.img.shape[0]
         self.colours=self.img.shape[2]
-
+        self.data=[]
     def dataPrint(self):
         print ("Data path: "+ self.link)
         print ("image width: "+ str(self.width) + " height: " + str(self.height))
@@ -36,7 +37,13 @@ class image:
         plt.plot(self.Harray,'g')
 
         plt.show()
-
+    def makeData(self):
+        self.data=self.Hlinearray+self.Hlinearray+self.Harray
+        #self.data.append(self.Hlinearray)
+        #self.data.append(self.Slinearray)
+        #self.data.append(self.Harray)
+        self.data.append(int(self.TextBusy))
+        print (self.data)
     def showOrgImg(self):
         cv2.imshow("orignial image", self.org_img)
         cv2.waitKey(0)
@@ -100,13 +107,14 @@ class image:
 
         mask=cv2.erode(mask,self.ones_kernel,iterations = 3)
         mask=cv2.dilate(mask,self.ones_kernel,iterations = 3)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel)
 
         self.mask=mask
-        #self.img = skel
+        #self.img=mask
         self.img = cv2.bitwise_and(self.img,self.img, mask= mask)
     def getHSvalue(self):
-        img_h=self.img[:,:,0]
-        img_s=self.img[:,:,1]
+        #img_h=self.img[:,:,0]
+        #img_s=self.img[:,:,1]
         self.hist_s = cv2.calcHist([self.img[:,:,0]],[0],None,[256],[1,256])
         self.hist_h = cv2.calcHist([self.img[:,:,1]],[0],None,[256],[1,256])
 
@@ -114,9 +122,10 @@ class image:
         self.Harray=[0,0,0,0,0,0]
         for i in range(0,5):
             for j in range(1,int(len(self.hist_h)/5)):
-                self.Harray[i]+=self.hist_h[j*(1+i)]
+                self.Harray[i]+=int(self.hist_h[j*(1+i)])
 
-    def getLineHSvalue(self, n):
+    def getLineHSvalue(self):
+        n = int(self.img.shape[0]/2)
         img_h=self.img[n,:,0]
         img_s=self.img[n,:,1]
         self.Hlinearray=[0,0,0,0,0,0]
@@ -137,3 +146,50 @@ class image:
         self.TextBusy = 0
         for i in range(1,len(canyHist)):
             self.TextBusy+=canyHist[i]
+    def findCont(self):
+        _ ,contours,_ = cv2.findContours(self.mask,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE)
+        self.rect = cv2.minAreaRect(contours[0])
+        box = cv2.boxPoints(self.rect)
+        self.box = np.int0(box)
+        #cv.drawContours(img,[box],0,(0,0,255),2)
+        rows,cols = self.img.shape[:2]
+        [vx,vy,x,y] = cv2.fitLine(contours[0], cv2.DIST_L2,0,0.01,0.01)
+        print (np.int0([vx,vy,x,y]))
+        self.x=x
+        self.y=y
+        lefty = int((-x*vy/vx) + y)
+        righty = int(((cols-x)*vy/vx)+y)
+        print (lefty)
+        print (righty)
+        cv2.line(self.img,(cols-1,righty),(0,lefty),(0,255,0),2)
+
+        cv2.drawContours(self.img, [self.box], -1, (0,255,0), 3)
+    def subimage(self):
+
+        W = self.rect[1][0]
+        H = self.rect[1][1]
+
+        Xs = [i[0] for i in self.box]
+        Ys = [i[1] for i in self.box]
+        x1 = min(Xs)
+        x2 = max(Xs)
+        y1 = min(Ys)
+        y2 = max(Ys)
+
+        angle = self.rect[2]
+        #(np.cos(self.y/self.x)/np.pi*180)
+        print((np.cos(self.y/self.x)/np.pi*180) )
+        #if angle < -45:
+        #    angle += 90
+        # Center of rectangle in source image
+        center = ((x1+x2)/2,(y1+y2)/2)
+        # Size of the upright rectangle bounding the rotated rectangle
+        size = (x2-x1, y2-y1)
+        M = cv2.getRotationMatrix2D((size[0]/2, size[1]/2), angle, 1.0)
+        # Cropped upright rectangle
+        cropped = cv2.getRectSubPix(self.img, size, center)
+        cropped = cv2.warpAffine(cropped, M, size)
+        croppedW = H if H > W else W
+        croppedH = H if H < W else W
+        # Final cropped & rotated rectangle
+        self.img = cv2.getRectSubPix(cropped, (int(croppedW),int(croppedH)), (size[0]/2, size[1]/2))

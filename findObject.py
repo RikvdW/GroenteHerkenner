@@ -46,7 +46,7 @@ def helloworld(mask):
       skel=cv2.dilate(skel, element)
       #dingen proberen
       gray = np.copy(skel)
-      
+
       edges = cv2.Canny(gray,50,200, None, 3)
 
       gray = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
@@ -59,11 +59,16 @@ def helloworld(mask):
 
       minLineLength = 1000
       maxLineGap = 0
+<<<<<<< HEAD
 
       lines = cv2.HoughLinesP(skel, 1, np.pi/180,100, minLineLength,maxLineGap)
 
       print(lines[0])
       
+=======
+      lines = cv2.HoughLinesP(edges, 1, np.pi/180,100, minLineLength,maxLineGap)
+      #print(lines[0])
+>>>>>>> 860922f6e610208f56533e63bccf6f4787c7849c
       if lines is not None:
             for i in range(0, len(lines)):
                     rho = lines[i][0][0]
@@ -89,6 +94,14 @@ def helloworld(mask):
                   cv2.line(edges,(x1,y1),(x2,y2),(255,255,255),10)
       """
 
+<<<<<<< HEAD
       
       
+=======
 
+      #for x1,y1,x2,y2 in lines[0]:
+       #       print("hello")
+        #      cv2.line(edges,(x1,y1),(x2,y2),(255,255,255),200)
+>>>>>>> 860922f6e610208f56533e63bccf6f4787c7849c
+
+      cv2.imshow("lines", edges)
