@@ -43,7 +43,6 @@ class image:
         #self.data.append(self.Slinearray)
         #self.data.append(self.Harray)
         self.data.append(int(self.TextBusy))
-        print (self.data)
     def showOrgImg(self):
         cv2.imshow("orignial image", self.org_img)
         cv2.waitKey(0)
@@ -132,7 +131,6 @@ class image:
         self.Slinearray=[0,0,0,0,0,0]
         for i in range(0,5):
             for j in range(1,int(len(img_h)/5)):
-                #print (self.hist_h[j])
                 self.Hlinearray[i]+=img_h[j*(1+i)]
                 self.Slinearray[i]+=img_s[j*(1+i)]
         if(self.Hlinearray[len(self.Hlinearray)-1]>self.Hlinearray[0]):
@@ -158,15 +156,12 @@ class image:
         #cv.drawContours(img,[box],0,(0,0,255),2)
         rows,cols = self.img.shape[:2]
         [vx,vy,x,y] = cv2.fitLine(cnt, cv2.DIST_L2,0,0.01,0.01)
-        print ([vx,vy,x,y])
         self.vx=vx
         self.vy=vy
         self.x=x
         self.y=y
         lefty = int((-x*vy/vx) + y)
         righty = int(((cols-x)*vy/vx)+y)
-        print ("lefty"+str(lefty))
-        print ("righty"+str(righty))
         cv2.line(self.img,(cols-1,righty),(0,lefty),(0,255,0),2)
         self.cols=cols
         cv2.drawContours(self.img, [self.box], -1, (0,255,0), 3)
@@ -183,10 +178,6 @@ class image:
         y2 = max(Ys)
 
         angle = self.vy/self.vx*160/np.pi#self.rect[2]
-        print (self.rect[2])
-        #(np.cos(self.y/self.x)/np.pi*180)
-        print ("cool")
-        print(self.vy/self.vx)
         if angle < -45:
             angle += 90
         # Center of rectangle in source image
