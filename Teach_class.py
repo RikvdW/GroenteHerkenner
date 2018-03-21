@@ -72,7 +72,7 @@ class Teach:
         print("MultinomialNB" + str(self.MNB.predict([n])))
         print(self.MNB.predict_proba([n]))
         print("Meriest centroid"+ str(self.NC.predict([n])))
-        print(self.NC.predict_proba([n]))
+        #print(self.NC.predict_proba([n]))
         print("Support vector machine (SVC)" + str(self.SVC.predict([n])))
         print(self.MNB.predict_log_proba([n]))
 
