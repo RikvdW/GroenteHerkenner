@@ -36,13 +36,14 @@ class image:
         plt.plot(self.Slinearray,'b')
         plt.plot(self.Harray,'g')
 
-        plt.show()
+        #plt.show()
     def makeData(self):
         self.data=self.Hlinearray+self.Hlinearray+self.Harray
         #self.data.append(self.Hlinearray)
         #self.data.append(self.Slinearray)
         #self.data.append(self.Harray)
         self.data.append(int(self.TextBusy))
+        print(self.data)
     def showOrgImg(self):
         cv2.imshow("orignial image", self.org_img)
         cv2.waitKey(0)
@@ -118,19 +119,24 @@ class image:
         self.hist_h = cv2.calcHist([self.img[:,:,1]],[0],None,[256],[1,256])
 
     def QuantiseHvalue(self):
-        self.Harray=[0,0,0,0,0,0]
-        for i in range(0,5):
-            for j in range(1,int(len(self.hist_h)/5)):
+        self.Harray=[]
+        for i in range(0,40):
+            self.Harray.append(0)
+        for i in range(0,40):
+            for j in range(1,int(len(self.hist_h)/40)):
                 self.Harray[i]+=int(self.hist_h[j*(1+i)])
 
     def getLineHSvalue(self):
         n = int(self.img.shape[0]/2)
         img_h=self.img[n,:,0]
         img_s=self.img[n,:,1]
-        self.Hlinearray=[0,0,0,0,0,0]
-        self.Slinearray=[0,0,0,0,0,0]
-        for i in range(0,5):
-            for j in range(1,int(len(img_h)/5)):
+        self.Hlinearray=[]
+        self.Slinearray=[]
+        for i in range(0,40):
+            self.Hlinearray.append(0)
+            self.Slinearray.append(0)
+        for i in range(0,40):
+            for j in range(1,int(len(img_h)/40)):
                 self.Hlinearray[i]+=img_h[j*(1+i)]
                 self.Slinearray[i]+=img_s[j*(1+i)]
         if(self.Hlinearray[len(self.Hlinearray)-1]>self.Hlinearray[0]):

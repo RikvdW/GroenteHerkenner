@@ -2,6 +2,13 @@ import numpy as np
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import svm
 from sklearn.neighbors.nearest_centroid import NearestCentroid
+from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import SGDClassifier
+from sklearn.kernel_approximation import RBFSampler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import BaggingClassifier
+import pickle
 
 
 class Teach:
@@ -20,17 +27,54 @@ class Teach:
         self.teach()
 
     def teach(self):
-        X = self.training
+        InputL = open('labels.pkl', 'rb')
+        one = pickle.load(InputL)
+        y=[]
+        Input = open('data.pkl', 'rb')
+        X = pickle.load(Input)
+        for i in one:
+            if i == 1:
+                y.append("prei")
+            elif i == 2:
+                y.append("aubergine")
+            elif i == 3:
+                y.append("radijs")
+            elif i == 4:
+                y.append("wortel")
+            elif i == 5:
+                y.append("broccoli")
 
-        y = self.labels
+        self.MNB =  MultinomialNB()
+        self.NC =  NearestCentroid()
+        self.SVC = svm.SVC()
+        self.Nur = MLPClassifier(solver='adam', alpha=1e-5,hidden_layer_sizes=(1000, 500), random_state=1000,learning_rate='adaptive',warm_start=True,max_iter=1)
+        self.SGDC = SGDClassifier(loss="log", penalty="elasticnet",random_state=100,max_iter=10)
+        self.RF = RandomForestClassifier(n_estimators=1000)
+        self.bagging = BaggingClassifier(KNeighborsClassifier(),max_samples=0.5, max_features=0.5)
 
-        self.clf =  NearestCentroid()
-        self.clf.fit(X, y)
-        print(self.clf.get_params())
-        print(self.clf.score(X,y))
+        self.bagging.fit(X,y)
+        self.RF.fit(X, y)
+        self.SGDC.fit(X, y)
+        self.MNB.fit(X, y)
+        self.NC.fit(X, y)
+        self.SVC.fit(X, y)
+        self.Nur.fit(X,y)
+
     def Predict(self, n):
-        print(self.clf.predict([n]))
-        #print(self.clf.predict_log_proba([n]))
+        print("bagging" + str(self.bagging.predict([n])))
+        print(self.bagging.predict_proba([n]))
+        print("random forest" + str(self.RF.predict([n])))
+        print(self.RF.predict_proba([n]))
+        print("SGDC" + str(self.SGDC.predict([n])))
+        print(self.SGDC.predict_proba([n]))
+        print("Nerual" + str(self.Nur.predict([n])))
+        print(self.Nur.predict_proba([n]))
+        print("MultinomialNB" + str(self.MNB.predict([n])))
+        print(self.MNB.predict_proba([n]))
+        print("Meriest centroid"+ str(self.NC.predict([n])))
+        print(self.NC.predict_proba([n]))
+        print("Support vector machine (SVC)" + str(self.SVC.predict([n])))
+        print(self.MNB.predict_log_proba([n]))
 
 
 
