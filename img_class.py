@@ -43,6 +43,7 @@ class image:
         #self.data.append(self.Slinearray)
         #self.data.append(self.Harray)
         self.data.append(int(self.TextBusy))
+        print("bla")
         print(self.data)
     def showOrgImg(self):
         cv2.imshow("orignial image", self.org_img)
@@ -105,6 +106,8 @@ class image:
         mask2 = cv2.inRange(self.img, min_red2, max_red2)
         mask = (mask1+mask2)
 
+        
+
         mask=cv2.erode(mask,self.ones_kernel,iterations = 3)
         mask=cv2.dilate(mask,self.ones_kernel,iterations = 3)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel)
@@ -159,7 +162,7 @@ class image:
         self.rect = cv2.minAreaRect(cnt)
         box = cv2.boxPoints(self.rect)
         self.box = np.int0(box)
-        #cv.drawContours(img,[box],0,(0,0,255),2)
+        #cv2.drawContours(img,[box],0,(0,0,255),2)
         rows,cols = self.img.shape[:2]
         [vx,vy,x,y] = cv2.fitLine(cnt, cv2.DIST_L2,0,0.01,0.01)
         self.vx=vx
